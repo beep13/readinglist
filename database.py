@@ -11,7 +11,8 @@ CREATE_BOOKS_TABLE = """CREATE TABLE IF NOT EXISTS books(
 INSERT_BOOKS = "INSERT INTO books (titles, release_timestamp, watched) VALUES (?, ?, 0);"
 SELECT_ALL_BOOKS = "SELECT * FROM books;"
 SELECT_UPCOMING_BOOKS = "SELECT * FROM books WHERE release_timestamp > ?;"
-SELECT_READ_BOOKS = "SELECT * FROM movies WHERE watched = 1;"
+SELECT_READ_BOOKS = "SELECT * FROM books WHERE watched = 1;"
+SET_BOOK_WATCHED = "UPDATE books SET read = 1 WHERE title = ?;"
 
 connection = sqlite3.connect("data.db")
 
@@ -37,7 +38,8 @@ def get_books(upcoming=False):
 
 
 def read_book(title):
-    pass
+    with connection:
+        connection.execute(INSERT_BOOKS, (title, ))
 
 def get_read_books():
     with connection:
