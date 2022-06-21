@@ -7,7 +7,8 @@ menu = """Please select one of the following options:
 3) View all books
 4) Read a book
 5) View read books.
-6) Exit.
+6) Add new user
+7) Exit.
 
 Your selection: """
 welcome = "Welcome to the reading list app!"
@@ -29,26 +30,32 @@ def prompt_add_book():
 def print_book_list(heading, books):
     print(f"-- {heading} books --")
     for book in books:
-        book_date = datetime.datetime.fromtimestamp(book[1])
+        book_date = datetime.datetime.fromtimestamp(book[2])
         human_date = book_date.strftime("%b %d %Y")
-        print(f"{book[0]} (published on {human_date})")
-    print("---- \n")
-
-
-def print_read_books_list(username, books):
-    print(f"-- {username}'s read books --")
-    for book in books:
-        print(f"{book[1]}")
+        print(f"{book[0]}: {book[1]} (published on {human_date})")
     print("---- \n")
 
 
 def prompt_read_book():
     username = input("Username: ")
-    book_title = input("Enter book title you've read: ")
-    database.read_book(username, book_title)
+    book_id = input("Book ID: ")
+    database.read_book(username, book_id)
 
 
-while (user_input := input(menu)) != "6":
+def prompt_add_user():
+    username = input("Username: ")
+    database.add_user(username)
+
+def prompt_show_read_books():
+    username = input("Username: ")
+    books = database.get_read_books(username)
+    if books:
+        print_book_list("Watched", books)
+    else:
+        print("You haven't read any books yet!")
+
+
+while (user_input := input(menu)) != "7":
     if user_input == "1":
         prompt_add_book()
     elif user_input == "2":
@@ -60,8 +67,8 @@ while (user_input := input(menu)) != "6":
     elif user_input == "4":
         prompt_read_book()
     elif user_input == "5":
-        username = input("Username: ")
-        books = database.get_read_books(username)
-        print_read_books_list(username, books)
+        prompt_show_read_books()
+    elif user_input == "6":
+        prompt_add_user()
     else:
         print("Invalid input, please try again!")
