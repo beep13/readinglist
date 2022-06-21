@@ -4,21 +4,29 @@ from urllib.parse import ParseResultBytes
 
 CREATE_BOOKS_TABLE = """CREATE TABLE IF NOT EXISTS books(
     title TEXT,
-    release_timestamp REAL,
-    watched INTEGER
+    release_timestamp REAL
 );"""
 
-INSERT_BOOKS = "INSERT INTO books (title, release_timestamp, watched) VALUES (?, ?, 0);"
+CREATE_READLIST_TABLE = """CREATE TABLE IF NOT EXISTS read (
+    reader_name TEXT,
+    title TEXT
+);"""
+
+INSERT_BOOKS = "INSERT INTO books (title, release_timestamp) VALUES (?, ?);"
+DELETE_MOVIE = "DELETE FROM books WHERE  title = ?;"
 SELECT_ALL_BOOKS = "SELECT * FROM books;"
 SELECT_UPCOMING_BOOKS = "SELECT * FROM books WHERE release_timestamp > ?;"
-SELECT_READ_BOOKS = "SELECT * FROM books WHERE watched = 1;"
+SELECT_READ_BOOKS = "SELECT * FROM read WHERE reader_name = ?;"
+INSERT_READ_BOOK = "INSERT INTO read (reader_name, title) VALUES (?, ?)"
 SET_BOOK_WATCHED = "UPDATE books SET read = 1 WHERE title = ?;"
+
 
 connection = sqlite3.connect("data.db")
 
 def create_tables():
     with connection:
         connection.execute(CREATE_BOOKS_TABLE)
+        connection.execute(CREATE_READLIST_TABLE)
 
 
 def add_book(title, release_timestamp):
@@ -37,12 +45,14 @@ def get_books(upcoming=False):
         return cursor.fetchall()
 
 
-def read_book(title):
+def read_book(username, title):
     with connection:
-        connection.execute(INSERT_BOOKS, (title, ))
+        connection.execute(DELETE_MOVIE, (title, ))
+        connection.execute(INSERT_READ_BOOK, (username, title))
 
-def get_read_books():
+
+def get_read_books(username):
     with connection:
         cursor = connection.cursor()
-        cursor.execute(SELECT_READ_BOOKS)
+        cursor.execute(SELECT_READ_BOOKS, (username,))
         return cursor.fetchall()

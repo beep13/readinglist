@@ -35,9 +35,17 @@ def print_book_list(heading, books):
     print("---- \n")
 
 
+def print_read_books_list(username, books):
+    print(f"-- {username}'s read books --")
+    for book in books:
+        print(f"{book[1]}")
+    print("---- \n")
+
+
 def prompt_read_book():
+    username = input("Username: ")
     book_title = input("Enter book title you've read: ")
-    database.read_book(book_title)
+    database.read_book(username, book_title)
 
 
 while (user_input := input(menu)) != "6":
@@ -52,7 +60,8 @@ while (user_input := input(menu)) != "6":
     elif user_input == "4":
         prompt_read_book()
     elif user_input == "5":
-        books = database.get_read_books()
-        print_book_list("Read", books)
+        username = input("Username: ")
+        books = database.get_read_books(username)
+        print_read_books_list(username, books)
     else:
         print("Invalid input, please try again!")
