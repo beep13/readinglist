@@ -8,7 +8,8 @@ menu = """Please select one of the following options:
 4) Read a book
 5) View read books.
 6) Add new user
-7) Exit.
+7) Search for a movie
+8) Exit
 
 Your selection: """
 welcome = "Welcome to the reading list app!"
@@ -42,9 +43,19 @@ def prompt_read_book():
     database.read_book(username, book_id)
 
 
+def prompt_search_books():
+    search_term = input("Enter the partial movie title: ")
+    books = database.search_books(search_term)
+    if books:
+        print_book_list("Books found!", books)
+    else:
+        print("No books found :(")
+
+
 def prompt_add_user():
     username = input("Username: ")
     database.add_user(username)
+
 
 def prompt_show_read_books():
     username = input("Username: ")
@@ -55,7 +66,7 @@ def prompt_show_read_books():
         print("You haven't read any books yet!")
 
 
-while (user_input := input(menu)) != "7":
+while (user_input := input(menu)) != "8":
     if user_input == "1":
         prompt_add_book()
     elif user_input == "2":
@@ -70,5 +81,7 @@ while (user_input := input(menu)) != "7":
         prompt_show_read_books()
     elif user_input == "6":
         prompt_add_user()
+    elif user_input == "7":
+        prompt_search_books()
     else:
         print("Invalid input, please try again!")

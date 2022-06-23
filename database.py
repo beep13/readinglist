@@ -14,7 +14,7 @@ CREATE_USERS_TABLE = """CREATE TABLE IF NOT EXISTS users (
 
 CREATE_READ_TABLE = """CREATE TABLE IF NOT EXISTS read (
     user_username TEXT,
-    book_id INTEGER,
+    book_id INTEGER, 
     FOREIGN KEY(user_username) REFERENCES users(username),
     FOREIGN KEY(book_id) REFERENCES books(id)
 );"""
@@ -30,7 +30,8 @@ JOIN users on users.username = read.user_username
 WHERE users.username = ?;"""
 INSERT_READ_BOOK = "INSERT INTO read (user_username, book_id) VALUES (?, ?);"
 SET_BOOK_WATCHED = "UPDATE books SET read = 1 WHERE title = ?;"
-
+SEARCH_BOOKS = "SELECT * FROM books WHERE title LIKE ?;"
+CREATE_PUBLISH_INDEX = "CREATE INDEX IF NOT EXISTS idx_books_release ON books(release_timestamp);"
 
 connection = sqlite3.connect("data.db")
 
@@ -40,6 +41,7 @@ def create_tables():
         connection.execute(CREATE_BOOKS_TABLE)
         connection.execute(CREATE_USERS_TABLE)
         connection.execute(CREATE_READ_TABLE)
+        connection.execute(CREATE_PUBLISH_INDEX)
 
 
 def add_user(username):
@@ -60,6 +62,12 @@ def get_books(upcoming=False):
             cursor.execute(SELECT_UPCOMING_BOOKS, (today_timestamp,))
         else:
             cursor.execute(SELECT_ALL_BOOKS)
+        return cursor.fetchall()
+
+def search_books(search_term):
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute(SEARCH_BOOKS, (f"%{search_term}%",))
         return cursor.fetchall()
 
 
